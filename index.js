@@ -8,6 +8,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const app = express()
 
+const STATUS_WAITING= 1
+const STATUS_FULL = 2
+
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -52,8 +55,10 @@ app.post('/game', (req, res, next) => {
   const game = {
     player1: req.body.player1,
     player2: req.body.player2,
-    health1: 100,
-    health2:100,
+    health1: req.body.health1,
+    health2: req.body.health2,
+    status1: req.body.status1,
+    status2: req.body.status2
 }
   Game
   .create(game)
@@ -71,6 +76,25 @@ app.post('/game', (req, res, next) => {
   
 })
 
+
+app.put('/game/:id', (req, res, next) => {
+  console.log('req', req.params.id);
+  
+  Game
+    .findByPk(req.params.id)
+    .then(game => {
+      if (!game) {
+        return res.status(404).send({
+          message: `Game does not exist`
+        })
+      }
+      return game.update(req.body).then(game => res.send(game))
+      .then(dispatchGames)
+    })
+    .catch(error => next(error))
+})
+
+
 function dispatchGames() { 
   Game.findAll()
     .then(game => {
@@ -85,6 +109,7 @@ function dispatchGames() {
 function dispatchGame(id) { 
   Game.findByPk(id)
     .then(game => {
+
       io.emit(
           'action',
           { type: 'CURRENT_GAME', payload: game } 

@@ -14,6 +14,12 @@ const Game = sequelize.define('game', {
   health2: {
     type: Sequelize.INTEGER,
   },
+  status1: {
+    type: Sequelize.INTEGER,
+  },
+  status2: {
+    type: Sequelize.INTEGER,
+  }
 }, {
   timestamps: false,
   tableName: 'game'

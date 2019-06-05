@@ -63,19 +63,31 @@ app.post('/game', (req, res, next) => {
         message: `game does not exist`
       })
     }
+    dispatchGame(game.id)
     return res.status(201).send(game)
   })
-  .then (dispatchGame)
+  .then (dispatchGames)
   .catch(error => next(error))
   
 })
 
-function dispatchGame() { 
-  Messages.findAll()
+function dispatchGames() { 
+  Game.findAll()
     .then(game => {
       io.emit(
           'action',
           { type: 'GAME', payload: game } 
+      )
+    })
+    .catch(error => next(error))
+}
+
+function dispatchGame(id) { 
+  Game.findByPk(id)
+    .then(game => {
+      io.emit(
+          'action',
+          { type: 'CURRENT_GAME', payload: game } 
       )
     })
     .catch(error => next(error))
@@ -94,6 +106,8 @@ io.on('connection', client => {
     console.log('client.id test', client.id);  
 
 dispatchUsers()
+dispatchGames()
+dispatchGame()
 
 client.on('disconnect', () => {
     console.log('disconnect test', client.id); 

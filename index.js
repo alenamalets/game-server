@@ -8,8 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const app = express()
 
-const STATUS_WAITING= 1
-const STATUS_FULL = 2
+const port = process.env.PORT || 4000
 
 
 app.use(cors())
@@ -121,9 +120,9 @@ function dispatchGame(id) {
 
 //------LISTEN-----
 function onListen() {
-    console.log('Listening on port 4000');   
+    console.log(`Listening on port ${port}`);   
 }
-const server = app.listen(4000,onListen )
+const server = app.listen(port,onListen )
 
 const io = socketIo.listen(server)
 
